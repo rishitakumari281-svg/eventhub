@@ -6,7 +6,7 @@
 import { USE_MOCK } from './config'
 import * as store from '../lib/store'
 import { categories as staticCategories } from '../data/events'
-import { request, tokenStore, tokenExpiryMs, ApiError } from './client'
+import { request, requestBlob, tokenStore, tokenExpiryMs, ApiError } from './client'
 import { mapEvent, mapUser, mapCategory } from './mappers'
 
 /* ---------- categories (cached for the session; a failed load is not cached) ---------- */
@@ -125,6 +125,13 @@ export const registrations = {
     })
   },
 
+  async scan(eventId, ticketId) {
+    return request(`/api/registrations/scan/${encodeURIComponent(eventId)}`, {
+      method: 'POST',
+      body: { ticketId }
+    })
+  },
+
   async activity(user) {
     if (USE_MOCK) return store.myActivity(user.id)
     return []
@@ -139,11 +146,13 @@ export const admin = {
   registrations(eventId) {
     return request(`/api/admin/events/${encodeURIComponent(eventId)}/registrations`)
   },
+
+  exportRegistrations(eventId) {
+    return requestBlob(`/api/admin/events/${encodeURIComponent(eventId)}/registrations/export`)
+  },
   attendance(id, present) {
     return request(`/api/admin/registrations/${encodeURIComponent(id)}/attendance?present=${present}`, {
       method: 'PUT'
     })
   }
 }
-
-

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useEffect } from 'react'
+import QRCode from 'qrcode'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import * as api from '../api'
@@ -8,6 +10,28 @@ import { isPast } from '../lib/store'
 import { formatDate, formatTime } from '../data/events'
 
 const TABS = [['upcoming', 'Upcoming'], ['past', 'Past'], ['cancelled', 'Cancelled']]
+function TicketQr({ ticketId }) {
+  const [qr, setQr] = useState('')
+
+  useEffect(() => {
+    QRCode.toDataURL(ticketId, {
+      width: 220,
+      margin: 2,
+      errorCorrectionLevel: 'H',
+    }).then(setQr).catch(console.error)
+  }, [ticketId])
+
+  if (!qr) return <span className="muted">Generating QR...</span>
+
+  return (
+    <div className="ticket-qr">
+      <img src={qr} alt="Event entry QR code" width="150" />
+      <a href={qr} download={`EventHub-${ticketId}.png`}>
+        Download QR
+      </a>
+    </div>
+  )
+}
 
 export default function MyRegistrations() {
   const { user, bump, tick } = useAuth()
@@ -52,6 +76,7 @@ export default function MyRegistrations() {
               <div className="regs__side">
                 <span className={'badge badge--' + (r.status === 'cancelled' ? 'closed' : tab === 'past' ? 'closed' : 'open')}><i />{r.status === 'cancelled' ? 'Cancelled' : tab === 'past' ? 'Completed' : 'Confirmed'}</span>
                 <span className="ticket-chip">{r.ticketId}</span>
+{r.status === 'confirmed' && <TicketQr ticketId={r.ticketId} />}
                 {tab === 'upcoming' && <button className="link-btn link-btn--danger" onClick={() => cancel(r)}>Cancel</button>}
               </div>
             </li>
@@ -59,7 +84,7 @@ export default function MyRegistrations() {
         </ul>
       ) : <div className="empty"><h3>Nothing here</h3><p>{tab === 'upcoming' ? 'You have no upcoming registrations.' : tab === 'past' ? 'Past events will appear here.' : 'No cancelled registrations.'}</p>
         {tab === 'upcoming' && <Link className="btn btn--primary" to="/explore">Explore events</Link>}</div>}
-      <p className="muted note">QR tickets and check-in arrive in Stage 5. The ticket ID above is what the QR code will carry.</p>
+
     </section>
   )
 }

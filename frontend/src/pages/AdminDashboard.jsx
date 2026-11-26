@@ -89,6 +89,24 @@ export default function AdminDashboard() {
     loadPeople(selected)
   }, [selected])
 
+  async function exportCsv() {
+    if (!selected) return
+
+    try {
+      setError('')
+      const blob = await api.admin.exportRegistrations(selected)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `event-${selected}-participants.csv`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } catch (e) {
+      setError(e.message || 'Could not export participants.')
+    }
+  }
   async function toggleAttendance(person) {
     setSaving(person.id)
     setError('')
@@ -417,6 +435,10 @@ export default function AdminDashboard() {
                 </option>
               ))}
             </select>
+            <button className="btn btn--primary" type="button"
+              onClick={exportCsv} disabled={!selected}>
+              Export CSV
+            </button>
           </div>
 
           <div className="admin-table-wrap">

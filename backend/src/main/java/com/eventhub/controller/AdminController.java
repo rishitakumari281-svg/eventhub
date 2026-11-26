@@ -115,5 +115,58 @@ public class AdminController {
         return Map.of("id", r.getId(), "present", present,
                       "message", present ? "Attendance marked." : "Attendance removed.");
     }
+    @GetMapping(value = "/events/{eventId}/registrations/export", produces = "text/csv")
+    @Transactional(readOnly = true)
+    public org.springframework.http.ResponseEntity<String> exportRegistrations(
+            @PathVariable Long eventId) {
+
+        if (!events.existsById(eventId))
+            throw new ApiException(HttpStatus.NOT_FOUND, "Event not found.");
+
+        StringBuilder csv = new StringBuilder();
+        csv.append("Event,Team,Participant Name,Participant Email,Role,Ticket ID,Registered At,Attendance,Checked In At\r\n");
+
+        for (Registration r : registrations.findByEventIdAndStatusOrderByCreatedAtDesc(
+                eventId, RegistrationStatus.CONFIRMED)) {
+
+            String eventName = r.getEvent().getTitle();
+            String teamName = r.getTeamName() == null ? "" : r.getTeamName();
+            String registeredAt = r.getCreatedAt() == null ? "" : r.getCreatedAt().toString();
+            String attendance = r.getCheckedInAt() == null ? "Absent" : "Present";
+            String checkedInAt = r.getCheckedInAt() == null ? "" : r.getCheckedInAt().toString();
+
+            csv.append(csvCell(eventName)).append(',')
+               .append(csvCell(teamName)).append(',')
+               .append(csvCell(r.getUser().getName())).append(',')
+               .append(csvCell(r.getUser().getEmail())).append(',')
+               .append("Leader,")
+               .append(csvCell(r.getTicketId())).append(',')
+               .append(csvCell(registeredAt)).append(',')
+               .append(attendance).append(',')
+               .append(csvCell(checkedInAt)).append("\r\n");
+
+            for (TeamMember member : r.getMembers()) {
+                csv.append(csvCell(eventName)).append(',')
+                   .append(csvCell(teamName)).append(',')
+                   .append(csvCell(member.getName())).append(',')
+                   .append(csvCell(member.getEmail())).append(',')
+                   .append("Member,")
+                   .append(csvCell(r.getTicketId())).append(',')
+                   .append(csvCell(registeredAt)).append(',')
+                   .append(attendance).append(',')
+                   .append(csvCell(checkedInAt)).append("\r\n");
+            }
+        }
+
+        return org.springframework.http.ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=event-" + eventId + "-participants.csv")
+            .header("Content-Type", "text/csv; charset=UTF-8")
+            .body("\uFEFF" + csv);
+    }
+
+    private String csvCell(String value) {
+        if (value == null) return "";
+        return "\"" + value.replace("\"", "\"\"") + "\"";
+    }
 }
 

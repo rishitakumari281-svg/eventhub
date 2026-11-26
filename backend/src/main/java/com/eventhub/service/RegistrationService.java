@@ -1,6 +1,7 @@
 package com.eventhub.service;
 
 import com.eventhub.dto.*;
+import java.util.Map;
 import com.eventhub.entity.*;
 import com.eventhub.exception.ApiException;
 import com.eventhub.repository.*;
@@ -85,12 +86,14 @@ public class RegistrationService {
         return toResponse(registration);
     }
 
+    @Transactional(readOnly = true)
     public RegistrationResponse active(AuthUser auth, Long eventId) {
         return registrations.findByUserIdAndEventIdAndStatus(
             auth.id(), eventId, RegistrationStatus.CONFIRMED)
             .map(this::toResponse).orElse(null);
     }
 
+    @Transactional(readOnly = true)
     public List<RegistrationResponse> mine(AuthUser auth) {
         return registrations.findByUserIdOrderByCreatedAtDesc(auth.id())
             .stream().map(this::toResponse).toList();
@@ -107,6 +110,39 @@ public class RegistrationService {
         r.setStatus(RegistrationStatus.CANCELLED);
         r.setCancelledAt(Instant.now());
     }
+@Transactional
+public Map<String, Object> scanTicket(AuthUser auth, Long eventId, String ticketId) {
+    Registration r = registrations.findByTicketId(ticketId)
+        .orElseThrow(() -> new ApiException(
+            HttpStatus.NOT_FOUND, "Invalid QR code. Ticket not found."));
+
+    if (!r.getEvent().getId().equals(eventId))
+        throw new ApiException(HttpStatus.BAD_REQUEST,
+            "This ticket belongs to another event.");
+
+    if (r.getStatus() != RegistrationStatus.CONFIRMED)
+        throw new ApiException(HttpStatus.BAD_REQUEST,
+            "This registration is cancelled.");
+
+    if (auth.role() != Role.ADMIN &&
+        !r.getEvent().getOrganizer().getId().equals(auth.id()))
+        throw new ApiException(HttpStatus.FORBIDDEN,
+            "You cannot scan tickets for this event.");
+
+    if (r.getCheckedInAt() != null)
+        throw new ApiException(HttpStatus.CONFLICT,
+            "Attendance already marked for this ticket.");
+
+    r.setCheckedInAt(Instant.now());
+    registrations.save(r);
+
+    return Map.of(
+        "success", true,
+        "name", r.getUser().getName(),
+        "event", r.getEvent().getTitle(),
+        "message", "Attendance marked successfully."
+    );
+}
 
     private RegistrationResponse toResponse(Registration r) {
         Event e = r.getEvent();

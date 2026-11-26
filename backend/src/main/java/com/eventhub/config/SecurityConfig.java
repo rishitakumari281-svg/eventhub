@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/events/*").hasAnyRole("ORGANIZER", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/events/*/permanent").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/events/*").hasAnyRole("ORGANIZER", "ADMIN")
+.requestMatchers(HttpMethod.POST, "/api/registrations/scan/*").hasAnyRole("ORGANIZER", "ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex

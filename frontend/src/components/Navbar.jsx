@@ -24,6 +24,9 @@ export default function Navbar() {
           <a href="/#how" onClick={close}>How it works</a>
           {user ? (<>
             <NavLink to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={close}>Dashboard</NavLink>
+            {(user.role === 'admin' || user.role === 'organizer') && (
+              <NavLink to="/scanner" onClick={close}>QR Scanner</NavLink>
+            )}
             <NavLink to="/registrations" onClick={close}>My registrations</NavLink>
             <button className="btn btn--ghost btn--sm" onClick={out}>Log out</button>
           </>) : (<>
@@ -35,4 +38,3 @@ export default function Navbar() {
     </header>
   )
 }
-

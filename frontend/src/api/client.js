@@ -69,3 +69,27 @@ export async function request(path, { method = 'GET', body, auth = true } = {}) 
   }
   return data
 }
+
+
+/** Downloads an authenticated file response. */
+export async function requestBlob(path) {
+  const headers = {}
+  const token = tokenStore.get()
+  if (token) headers.Authorization = `Bearer ${token}`
+
+  let res
+  try {
+    res = await fetch(API_BASE + path, { method: 'GET', headers })
+  } catch {
+    throw new ApiError(0, "Can't reach the server. Check that the backend is running and try again.")
+  }
+
+  if (!res.ok) {
+    let data = null
+    try { data = await res.json() } catch {}
+    if (res.status === 401 && token && onUnauthorized) onUnauthorized()
+    throw new ApiError(res.status, data?.message || 'Could not download the file.')
+  }
+
+  return res.blob()
+}
