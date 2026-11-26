@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
     long countByEventIdAndStatus(Long eventId, RegistrationStatus status);
+    long countByEventId(Long eventId);
 
     @Query("select count(m) from TeamMember m where m.registration.event.id = :eventId and m.registration.status = :status")
     long countMembers(@Param("eventId") Long eventId, @Param("status") RegistrationStatus status);
@@ -23,3 +24,4 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     long countByStatus(RegistrationStatus status);
     long countByStatusAndCheckedInAtIsNotNull(RegistrationStatus status);
 }
+

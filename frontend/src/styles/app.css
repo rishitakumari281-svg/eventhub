@@ -117,3 +117,55 @@
 .async--error { padding: 28px; border: 1.5px dashed var(--terracotta); background: #fbeee8; display: grid; gap: 8px; justify-items: start; }
 .async--error h3 { font-family: var(--font-display); font-weight: 500; font-size: 1.3rem; color: var(--forest); }
 .app-boot { text-align: center; padding: 120px 24px; }
+
+/* Admin dashboard */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 16px;
+  margin: 32px 0 48px;
+}
+.admin-stat {
+  background: var(--sand);
+  padding: 22px;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.admin-stat span { color: #5d645a; font-size: .85rem; }
+.admin-stat strong {
+  font-family: var(--font-display);
+  color: var(--forest);
+  font-size: 2.2rem;
+  font-weight: 500;
+}
+.admin-section { margin-top: 48px; }
+.admin-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--sand);
+  border-radius: var(--radius);
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+  background: white;
+}
+.admin-table th, .admin-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--sand);
+  font-size: .88rem;
+}
+.admin-table th {
+  background: var(--sand);
+  color: var(--forest);
+  font-weight: 700;
+}
+.admin-table tr:last-child td { border-bottom: 0; }
+.admin-select { max-width: 420px; margin: 20px 0; }
+.attendance-present { color: #26713b; font-weight: 700; }
+.attendance-absent { color: #a34b32; font-weight: 700; }
+.admin-action { font-size: .8rem; padding: 7px 10px; }

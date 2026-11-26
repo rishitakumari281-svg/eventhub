@@ -24,6 +24,7 @@ export function mapEvent(d) {
     teamMin: d.teamMin,
     teamMax: d.teamMax,
     schedule: (d.schedule || []).map(s => [s.time, s.title]), // API: {time,title}; UI: [time, title]
+    visibility: d.visibility,
     serverStatus: d.status,          // OPEN | FILLING | FULL | CLOSED. Kept for Phase B (see note in README).
   }
 }
@@ -32,3 +33,4 @@ export const mapCategory = (c) => ({ id: c.id, name: c.name, blurb: c.blurb })
 
 // The API sends 'STUDENT' | 'ORGANIZER' | 'ADMIN'; the UI uses lowercase.
 export const mapUser = (u) => ({ id: u.id, name: u.name, email: u.email, role: String(u.role || '').toLowerCase() })
+

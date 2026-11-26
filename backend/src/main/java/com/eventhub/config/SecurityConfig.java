@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/events", "/api/events/*", "/api/categories").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/events").hasAnyRole("ORGANIZER", "ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/events/*").hasAnyRole("ORGANIZER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/events/*/permanent").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/events/*").hasAnyRole("ORGANIZER", "ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
@@ -80,3 +81,4 @@ public class SecurityConfig {
         res.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message + "\"}");
     }
 }
+

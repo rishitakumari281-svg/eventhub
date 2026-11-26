@@ -1,0 +1,58 @@
+
+/* Admin event management */
+.admin-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.admin-event-form {
+  padding: 24px;
+  margin: 20px 0;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 14px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-event-form textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.admin-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 18px 0;
+}
+
+.admin-form-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+@media (max-width: 650px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn--danger {
+  background: #b42318;
+  color: #fff;
+  border: 1px solid #b42318;
+}
+
+.btn--danger:hover {
+  background: #912018;
+}

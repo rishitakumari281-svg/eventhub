@@ -37,6 +37,24 @@ export const events = {
     }
     return mapEvent(await request(`/api/events/${encodeURIComponent(id)}`, { auth: false }))
   },
+  async manageList() {
+    return (await request('/api/events/mine')).map(mapEvent)
+  },
+  async create(payload) {
+    return mapEvent(await request('/api/events', { method: 'POST', body: payload }))
+  },
+  async update(id, payload) {
+    return mapEvent(await request(`/api/events/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: payload
+    }))
+  },
+  async archive(id) {
+    return request(`/api/events/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  },
+  async permanentlyDelete(id) {
+    return request(`/api/events/${encodeURIComponent(id)}/permanent`, { method: 'DELETE' })
+  },
 }
 
 /* ---------- auth ---------- */
@@ -112,3 +130,20 @@ export const registrations = {
     return []
   },
 }
+
+// ADMIN DASHBOARD
+export const admin = {
+  dashboard() {
+    return request('/api/admin/dashboard')
+  },
+  registrations(eventId) {
+    return request(`/api/admin/events/${encodeURIComponent(eventId)}/registrations`)
+  },
+  attendance(id, present) {
+    return request(`/api/admin/registrations/${encodeURIComponent(id)}/attendance?present=${present}`, {
+      method: 'PUT'
+    })
+  }
+}
+
+

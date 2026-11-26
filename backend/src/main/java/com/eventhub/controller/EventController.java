@@ -44,4 +44,11 @@ public class EventController {
     public void archive(@PathVariable Long id, @AuthenticationPrincipal AuthUser user) {
         service.archive(id, user);
     }
+
+    @DeleteMapping("/{id}/permanent")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void permanentlyDelete(@PathVariable Long id, @AuthenticationPrincipal AuthUser user) {
+        service.permanentlyDelete(id, user);
+    }
 }
+

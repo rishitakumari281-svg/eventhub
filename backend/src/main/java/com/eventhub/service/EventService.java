@@ -92,6 +92,22 @@ public class EventService {
         events.save(e);
     }
 
+    /** Permanently delete only events that have never had registrations. */
+    @Transactional
+    public void permanentlyDelete(Long id, AuthUser user) {
+        if (user.role() != Role.ADMIN) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Only admins can permanently delete events.");
+        }
+
+        Event e = find(id);
+
+        if (registrations.countByEventId(id) > 0) {
+            throw bad("This event has registration history and cannot be permanently deleted. Archive it instead.");
+        }
+
+        events.delete(e);
+    }
+
     /* ---------- helpers ---------- */
 
     private void apply(Event e, EventRequest r) {
@@ -182,3 +198,4 @@ public class EventService {
                 .toList();
     }
 }
+
